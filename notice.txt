@@ -1,0 +1,8 @@
+it's for parse naver news
+need:
+-pip install bs4
+-pip install requests
+-pip install pymongo
+
+prepare:
+-mongod command on shell to open your mongodb port
