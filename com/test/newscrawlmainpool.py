@@ -3,19 +3,18 @@ Created on 2019. 5. 2.
 
 @author: Playdata
 '''
-import navercrawlasync
+
 import datetime
 import time
+import navercrawlpool
 import multiprocessing
 
 
-
-
-def hi():
+async def hi():
     now = time.strftime("%Y%m%d")
     e = datetime.datetime(int(now[0:4]), int(now[4:6]), int(now[6:]))
     #오늘부터 몇일치 뉴스를 크롤링할지 결정하는 변수입니다 --> n일치 => numdays = n
-    numdays = 30
+    numdays = 1
     date_list = [(e - datetime.timedelta(days=x)).strftime('%Y%m%d') for x in range(0, numdays)]
     #정치 섹션
     pol = ["https://news.naver.com/main/list.nhn?mode=LS2D&mid=shm&sid1=100&sid2=264",
@@ -77,6 +76,7 @@ def hi():
          "https://news.naver.com/main/list.nhn?mode=LS2D&mid=shm&sid1=105&sid2=229",
          "https://news.naver.com/main/list.nhn?mode=LS2D&mid=shm&sid1=105&sid2=228"]
     
+    #q=queue.Queue(16)
     p = multiprocessing.Pool(16)
     newspagelist = [pol, eco, soc, lifeandculture, world, itgi]
     params = []
@@ -87,7 +87,8 @@ def hi():
             #res.get()
             #await navercrawlpool.navercrawl(d,sec)
             params.append((d,sec))
-    p.map(navercrawlasync.navercrawl,params)
+    p.map(navercrawlpool.navercrawl,params)        
+            
            
     
 if __name__ == '__main__':

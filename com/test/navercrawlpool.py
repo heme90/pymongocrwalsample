@@ -20,46 +20,43 @@ t = con['news']['news_main']
 t.create_index([("url",pymongo.ASCENDING)],unique=True)
 print(t)
 #newspagelist = [itgi]
-newsss = []
-
-
 def mongoinsert(urllist):
-    loop = asyncio.get_event_loop()
-    futures = [mongoinasync(u) for u in urllist]
-    loop.run_until_complete(asyncio.wait(futures))
-    """for u in urllist:
-        mongoinasync(u)"""
-       
+    cnt=0
+    for u in urllist:
+        newsdata = bs4.BeautifulSoup(requests.get(u).text, "lxml")
+        #news number --> 시퀀스로 대체
+        nn = 1
+        try:
+            cate =  newsdata.find("meta", property="me2:category2")["content"]  
+            tit = newsdata.find("meta",property="og:title")["content"]
+            auth = newsdata.find("meta",property="og:article:author")['content']
+            ptime = newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
+            ctime = newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
+            cont =  newsdata.select("#articleBodyContents")[0].text
+            if(len(cont)<300):
+                continue;
+            #url = u
+        except BaseException:
+            print(u + "!!!!")
+            continue;
+        #NoneType
         
-@asyncio.coroutine    
-async def mongoinasync(u):
-    newsdata = await asyncio.get_event_loop().run_in_executor(None, bs4.BeautifulSoup,requests.get(u).text,"lxml")
-    #news number --> 시퀀스로 대체
-    nn = 1
-    try:
-        cate =  await newsdata.find("meta", property="me2:category2")["content"]  
-        tit = await newsdata.find("meta",property="og:title")["content"]
-        auth = await newsdata.find("meta",property="og:article:author")['content']
-        ptime = await newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
-        ctime = await newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
-        cont =  await newsdata.select("#articleBodyContents")[0].text
-        if(len(cont)<300):
-            print(u + "  it's to small!")
-            pass
-        #url = u
+        
         newsbody = {"news_number" : nn , "category" : cate, "title" :tit , "author" :auth, "posttime" :ptime , "chgtime" : ctime , "contents" : cont  , "url" :  u}
-        
-        t.insert_one(newsbody,bypass_document_validation = True)
-    except Exception:
-        print(u + "!!!!")
-        pass
-    #NoneType
-    
+        cnt +=1
+        try:
+            #await asyncio.get_event_loop().run_in_executor(None, t.insert_one,newsbody,bypass_document_validation = True)
+            t.insert_one(newsbody,bypass_document_validation = True)
+        except multiprocessing.ProcessError:
+            continue;
+        except Exception:
+            continue
+
 def navercrawl(ss):    
 #ss(date,sectiion[])
     for s in ss[1]:
         sectioncrawl(ss[0],s)
-  
+    
 def sectioncrawl(d,s):    
     urllist = []
     temp = "";
