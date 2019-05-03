@@ -94,6 +94,7 @@ def mongoinsert(urllist):
     cnt=0
     for u in urllist:
         newsdata = bs4.BeautifulSoup(requests.get(u).text, "lxml")
+        #html.parser
         #news number --> 시퀀스로 대체
         nn = 1
         try:
@@ -143,6 +144,9 @@ def navercrwal(d,section):
             newss = newslist.select("#main_content > div.list_body.newsflash_body > ul.type06_headline > li > dl > dt:first-child > a")
             for i in newss:
                 url = i["href"]
+                #url = i.href
+                #select()['']
+                #select().href
                 urllist.append(url)
                             
     print(len(urllist))

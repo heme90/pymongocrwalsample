@@ -6,16 +6,17 @@ Created on 2019. 5. 2.
 
 import bs4
 import requests
-import time
 import pymongo
+import multiprocessing
+
 
 #localhost, 27777 포트
 con = pymongo.MongoClient("127.0.0.1", 27777)
 
 #앞 괄호는 db 뒤 괄호는 collection
-t = con['news']['news_main']
+t = con['news']['test']
 #db.news_main.ensureIndex({"url" : 1 } , {unique : true})
-stt = time.time()
+t.create_index([("url",pymongo.ASCENDING)],unique=True)
 print(t)
 #newspagelist = [itgi]
 newsss = []
@@ -45,24 +46,27 @@ def mongoinsert(urllist):
         newsbody = {"news_number" : nn , "category" : cate, "title" :tit , "author" :auth, "posttime" :ptime , "chgtime" : ctime , "contents" : cont  , "url" :  u}
         cnt +=1
         try:
+            #await asyncio.get_event_loop().run_in_executor(None, t.insert_one,newsbody,bypass_document_validation = True)
             t.insert_one(newsbody,bypass_document_validation = True)
-        except BaseException:
+        except multiprocessing.ProcessError:
             continue;
+        except Exception:
+            continue
        
-    print(str(cnt) + " 번의  입력 시도가 있었습니다")
-    print(time.time() - stt)
-
-
-def navercrwal(d,section):    
-    urllist = []
-    temp = "";
+    
+def navercrawl(d,section):    
     for s in section:
-        addr = s + "&date=" + d
-        # getpage =  bs4.BeautifulSoup(requests.get(addr),"html.parser").select("div.paging>li:last-child").text
+        p = multiprocessing.Process(target=sectioncrawl,args=(d,s))
+        p.start()
+        
+        """addr = s + "&date=" + d
         for p in range(1, 100):
             addrs = addr + "&page=" + str(p)
+            #doc = await asyncio.get_event_loop().run_in_executor(None, requests.get,addrs)
             doc = requests.get(addrs)
+            #newslist = await asyncio.get_event_loop().run_in_executor(None, bs4.BeautifulSoup,doc.text,"lxml")
             newslist = bs4.BeautifulSoup(doc.text, "lxml")
+            #html.parser
             ttemp = newslist.select("#main_content > div.paging > strong")[0].text
             if(ttemp == temp):
                 print(addrs)
@@ -72,12 +76,34 @@ def navercrwal(d,section):
             newss = newslist.select("#main_content > div.list_body.newsflash_body > ul.type06_headline > li > dl > dt:first-child > a")
             for i in newss:
                 url = i["href"]
-                urllist.append(url)
+                urllist.append(url)"""
                             
-    print(len(urllist))
-    print(time.time() - stt)
-    mongoinsert(urllist)         
-
+    
+    #await mongoinsert(urllist)
+    
+def sectioncrawl(d,s):    
+    urllist = []
+    temp = "";
+    addr = s + "&date=" + d
+    for p in range(1, 100):
+        addrs = addr + "&page=" + str(p)
+        #doc = await asyncio.get_event_loop().run_in_executor(None, requests.get,addrs)
+        doc = requests.get(addrs)
+        #newslist = await asyncio.get_event_loop().run_in_executor(None, bs4.BeautifulSoup,doc.text,"lxml")
+        newslist = bs4.BeautifulSoup(doc.text, "lxml")
+        #html.parser
+        ttemp = newslist.select("#main_content > div.paging > strong")[0].text
+        if(ttemp == temp):
+            print(addrs)
+            break;
+        else:
+            temp = ttemp 
+        newss = newslist.select("#main_content > div.list_body.newsflash_body > ul.type06_headline > li > dl > dt:first-child > a")
+    for i in newss:
+        url = i["href"]
+        urllist.append(url)
+    
+    mongoinsert(urllist)
 
     
 

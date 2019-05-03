@@ -3,9 +3,12 @@ Created on 2019. 5. 2.
 
 @author: Playdata
 '''
-import navercrwal
+import navercrawlasync
 import datetime
 import time
+import multiprocessing
+
+
 
 def hi():
     now = time.strftime("%Y%m%d")
@@ -75,12 +78,19 @@ def hi():
     
     newspagelist = [pol, eco, soc, lifeandculture, world, itgi]
     
-
     for d in date_list:
         for sec in newspagelist:
-            navercrwal.navercrwal(d, sec)
-    
+            pro = multiprocessing.Process(target=navercrawlasync.navercrawl,args=(d,sec))
+            pro.start()
+            #await navercrawlasync.navercrawl(d,sec)
+            
+           
     
 if __name__ == '__main__':
+    
+    
+    st = time.time()
     hi()
+    print(time.time()-st)
+    
     

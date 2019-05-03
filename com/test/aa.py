@@ -55,7 +55,8 @@ print(len(urllist))
 print(time.time() - stt)         
 
 for u in urllist:
-    newsdata = bs4.BeautifulSoup(requests.get(u).text, "lxml")
+    newsdata = bs4.BeautifulSoup(requests.get(u).text, "html.parser")
+    print(newsdata.prettify())
     nn = 1
     try:
         cate =  newsdata.find("meta", property="me2:category2")["content"]  
@@ -83,7 +84,8 @@ for u in urllist:
     newsss.append(newsbody)
     try:
         t.insert_one(newsbody,bypass_document_validation =True)    
-    except BaseException:
+    except BaseException as e:
+        print(e)
         continue;
 print(len(newsss))    
 
