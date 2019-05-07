@@ -32,7 +32,7 @@ def mongoinsert(urllist):
         
 @asyncio.coroutine    
 async def mongoinasync(u):
-    newsdata = asyncio.get_event_loop().run_in_executor(None, bs4.BeautifulSoup,requests.get(u).text,"lxml")
+    newsdata = await asyncio.get_event_loop().run_in_executor(None, bs4.BeautifulSoup,requests.get(u).text,"lxml")
     #news number --> 시퀀스로 대체
     nn = 1
     try:
