@@ -15,8 +15,9 @@ def hi():
     now = time.strftime("%Y%m%d")
     e = datetime.datetime(int(now[0:4]), int(now[4:6]), int(now[6:]))
     #오늘부터 몇일치 뉴스를 크롤링할지 결정하는 변수입니다 --> n일치 => numdays = n
-    numdays = 30
+    numdays = 1
     date_list = [(e - datetime.timedelta(days=x)).strftime('%Y%m%d') for x in range(0, numdays)]
+   
     #정치 섹션
     pol = ["https://news.naver.com/main/list.nhn?mode=LS2D&mid=shm&sid1=100&sid2=264",
          "https://news.naver.com/main/list.nhn?mode=LS2D&mid=shm&sid1=100&sid2=265",
@@ -87,6 +88,7 @@ def hi():
             #res.get()
             #await navercrawlpool.navercrawl(d,sec)
             params.append((d,sec))
+    print(params)        
     p.map(navercrawlasync.navercrawl,params)
            
     

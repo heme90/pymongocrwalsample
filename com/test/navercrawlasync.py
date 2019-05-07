@@ -7,7 +7,6 @@ Created on 2019. 5. 2.
 import bs4
 import requests
 import pymongo
-import multiprocessing
 import asyncio
 
 
@@ -33,16 +32,16 @@ def mongoinsert(urllist):
         
 @asyncio.coroutine    
 async def mongoinasync(u):
-    newsdata = await asyncio.get_event_loop().run_in_executor(None, bs4.BeautifulSoup,requests.get(u).text,"lxml")
+    newsdata = asyncio.get_event_loop().run_in_executor(None, bs4.BeautifulSoup,requests.get(u).text,"lxml")
     #news number --> 시퀀스로 대체
     nn = 1
     try:
-        cate =  await newsdata.find("meta", property="me2:category2")["content"]  
-        tit = await newsdata.find("meta",property="og:title")["content"]
-        auth = await newsdata.find("meta",property="og:article:author")['content']
-        ptime = await newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
-        ctime = await newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
-        cont =  await newsdata.select("#articleBodyContents")[0].text
+        cate =  newsdata.find("meta", property="me2:category2")["content"]  
+        tit = newsdata.find("meta",property="og:title")["content"]
+        auth = newsdata.find("meta",property="og:article:author")['content']
+        ptime = newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
+        ctime = newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
+        cont =  newsdata.select("#articleBodyContents")[0].text
         if(len(cont)<300):
             print(u + "  it's to small!")
             pass
@@ -50,6 +49,7 @@ async def mongoinasync(u):
         newsbody = {"news_number" : nn , "category" : cate, "title" :tit , "author" :auth, "posttime" :ptime , "chgtime" : ctime , "contents" : cont  , "url" :  u}
         
         t.insert_one(newsbody,bypass_document_validation = True)
+        
     except Exception:
         print(u + "!!!!")
         pass
@@ -59,6 +59,7 @@ def navercrawl(ss):
 #ss(date,sectiion[])
     for s in ss[1]:
         sectioncrawl(ss[0],s)
+        
   
 def sectioncrawl(d,s):    
     urllist = []
