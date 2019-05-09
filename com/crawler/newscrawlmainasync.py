@@ -3,7 +3,7 @@ Created on 2019. 5. 2.
 
 @author: Playdata
 '''
-import navercrawlasync
+import crawler.navercrawlasync
 import datetime
 import time
 import multiprocessing
@@ -87,7 +87,7 @@ def hi():
             #await navercrawlpool.navercrawl(d,sec)
             params.append((d,sec))
     print(params)        
-    p.map(navercrawlasync.navercrawl,params)
+    p.map(crawler.navercrawlasync.navercrawl,params)
 if __name__ == '__main__':
     st = time.time()
     hi()
