@@ -10,6 +10,9 @@ import multiprocessing
 
 
 
+
+
+
 def hi():
     now = time.strftime("%Y%m%d")
     e = datetime.datetime(int(now[0:4]), int(now[4:6]), int(now[6:]))
@@ -76,17 +79,14 @@ def hi():
          "https://news.naver.com/main/list.nhn?mode=LS2D&mid=shm&sid1=105&sid2=283",
          "https://news.naver.com/main/list.nhn?mode=LS2D&mid=shm&sid1=105&sid2=229",
          "https://news.naver.com/main/list.nhn?mode=LS2D&mid=shm&sid1=105&sid2=228"]
-    p = multiprocessing.Pool(16)
+    p = multiprocessing.Pool(8)
     newspagelist = [pol, eco, soc, lifeandculture, world, itgi]
+    
     params = []
     for d in date_list:
         for sec in newspagelist:
-            #pro = multiprocessing.Process(target=navercrawlpool.navercrawl,args=(d,sec))
-            #res = p.apply_async(pro, ())
-            #res.get()
-            #await navercrawlpool.navercrawl(d,sec)
             params.append((d,sec))
-    print(params)        
+                    
     p.map(crawler.navercrawlasync.navercrawl,params)
 if __name__ == '__main__':
     st = time.time()

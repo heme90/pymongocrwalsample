@@ -6,7 +6,7 @@ Created on 2019. 5. 2.
 
 import datetime
 import time
-import navercrawlpool
+import test.navercrawlpool
 import multiprocessing
 
 
@@ -87,7 +87,7 @@ async def hi():
             #res.get()
             #await navercrawlpool.navercrawl(d,sec)
             params.append((d,sec))
-    p.map(navercrawlpool.navercrawl,params)        
+    p.map(test.navercrawlpool.navercrawl,params)        
             
            
     

@@ -3,9 +3,11 @@ Created on 2019. 5. 2.
 
 @author: Playdata
 '''
-import navercrawl
 import datetime
 import time
+
+import test.navercrawl
+
 
 def hi():
     st = time.time()
@@ -79,7 +81,7 @@ def hi():
 
     for d in date_list:
         for sec in newspagelist:
-            navercrawl.navercrawl(d, sec)
+            test.navercrawl.navercrawl(d, sec)
     
     print(time.time() - st)
 if __name__ == '__main__':

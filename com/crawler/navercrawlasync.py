@@ -8,7 +8,7 @@ import bs4
 import requests
 import pymongo
 import asyncio
-
+import numpy as np
 
 #localhost, 27777 포트
 con = pymongo.MongoClient("127.0.0.1", 27777)
@@ -23,11 +23,14 @@ print(t)
 
 
 
-def mongoinsert(urllist):
-    loop = asyncio.get_event_loop()
-    futures = [mongoinasync(u) for u in urllist]
-    loop.run_until_complete(asyncio.wait(futures))
-    """for u in urllist:
+def mongoinsert(urls):
+    if(urls.size == 0):
+        pass
+    else:
+        loop = asyncio.get_event_loop()
+        futures = [mongoinasync(u) for u in urls]
+        loop.run_until_complete(asyncio.wait(futures))
+        """for u in urllist:
         mongoinasync(u)"""
        
         
@@ -38,11 +41,17 @@ async def mongoinasync(u):
     #news number --> 시퀀스로 대체
     nn = 1
     try:
+        cont =  newsdata.select("#articleBodyContents")[0].text
+        if(len(cont)<300):
+            print(u + "  it's to small!")
+            pass
         cate =  newsdata.find("meta", property="me2:category2")["content"]  
         tit = newsdata.find("meta",property="og:title")["content"]
         auth = newsdata.find("meta",property="og:article:author")['content']
-        ptime = newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
-        ctime = newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
+        #ptime = newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
+        #ctime = newsdata.select("#main_content > div.article_header > div.article_info > div > span:nth-child(1)")[0].text
+        ptime = tday
+        ctime = tday
         cont =  newsdata.select("#articleBodyContents")[0].text
         if(len(cont)<300):
             print(u + "  it's to small!")
@@ -58,11 +67,21 @@ async def mongoinasync(u):
     
 def navercrawl(ss):    
 #ss(date,sectiion[])
+    d = ss[0]
+    days = t.find({"posttime" : {"$regex":"^"+d} },{"url" : 1})
+    datess = []
+    global tday
+    tday = d
+    for i in days:
+        datess.append(i["url"])
+    ds = np.array(datess)
+    del datess   
     for s in ss[1]:
-        sectioncrawl(ss[0],s)       
+        sectioncrawl(ss[0],s,ds)       
   
-def sectioncrawl(d,s):    
+def sectioncrawl(d,s,datess):    
     urllist = []
+    
     temp = "";
     addr = s + "&date=" + d
     for p in range(1, 100):
@@ -82,10 +101,16 @@ def sectioncrawl(d,s):
         newss = newslist.select("#main_content > div.list_body.newsflash_body > ul.type06_headline > li > dl > dt:first-child > a")
         for i in newss:
             url = i["href"]
-            urllist.append(url)
-        
-            
-    mongoinsert(urllist)
+            urllist.append([url])
+    
+    urlset = np.array(urllist)
+    del urllist   
+    urls = np.setdiff1d(urlset, datess)    
+    
+    del urlset
+    del datess    
+    
+    mongoinsert(urls)
 
     
 

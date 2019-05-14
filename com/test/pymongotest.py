@@ -5,8 +5,19 @@ Created on 2019. 4. 30.
 '''
 
 import pymongo
-
+from bson import regex
 connection = pymongo.MongoClient("127.0.0.1", 27777)
+d = "20190514"
+op = connection.news.news_main
+day = d[0:4] + "." + d[4:6] + "." + d[6:]
+print(day)
+res = op.find({"posttime" : {"$regex":"^"+day} },{"url" : 1})
 
-op = connection.api
-print(op["Dartdetail"].get_all)
+
+dates = []
+for i in res:
+    dates.append(i["url"])    
+for k in range(len(dates)):
+    print(dates[k])    
+
+print(len(dates))
