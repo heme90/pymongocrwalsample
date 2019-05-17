@@ -3,15 +3,13 @@ Created on 2019. 5. 2.
 
 @author: Playdata
 '''
-import crawler.navercrawlasync
 import datetime
-import time
 import multiprocessing
+import os
+import time
 
-
-
-
-
+import navernewss.navercrawlasync
+os.system("compath.bat")
 
 def hi():
     now = time.strftime("%Y%m%d")
@@ -87,10 +85,17 @@ def hi():
         for sec in newspagelist:
             params.append((d,sec))
                     
-    p.map(crawler.navercrawlasync.navercrawl,params)
+    p.map(navernewss.navercrawlasync.navercrawl,params)
+
 if __name__ == '__main__':
     st = time.time()
-    hi()
-    print(time.time()-st)
     
+    
+    hi()
+    
+    print(time.time() - st)
+
+    
+
+     
     

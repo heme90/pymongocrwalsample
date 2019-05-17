@@ -105,6 +105,7 @@ def sectioncrawl(d,s,datess):
     
     urlset = np.array(urllist)
     del urllist   
+    
     urls = np.setdiff1d(urlset, datess)    
     
     del urlset
