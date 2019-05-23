@@ -8,7 +8,7 @@ Created on 2019. 5. 2.
 import asyncio
 import datetime
 import multiprocessing
-import os
+
 
 import time
 
@@ -18,7 +18,6 @@ import requests
 
 import numpy as np
 
-os.system("C:\\MyPython\\mpython\\com\\crawler\\navernewss\\compath.bat")
 
 class cp_crwaler:
     
@@ -135,7 +134,8 @@ class cp_crwaler:
         try:
             cont =  newsdata.select("#articleBodyContents")[0].text
             if(len(cont)<300):
-                pass
+                raise Exception
+            
             cate =  newsdata.find("meta", property="me2:category2")["content"]  
             tit = newsdata.find("meta",property="og:title")["content"]
             auth = newsdata.find("meta",property="og:article:author")['content']
@@ -144,12 +144,16 @@ class cp_crwaler:
             ptime = tday
             ctime = tday
             #url = u
-            newsbody = {"news_number" : nn , "category" : cate, "title" :tit , "author" :auth, "posttime" :ptime , "chgtime" : ctime , "contents" : cont  , "url" :  u}
+            newsbody = {"news_number" : nn , "category" : cate, "title" :tit , "author" :auth, "posttime" :ptime , "chgtime" : ctime , "contents" : cont  , "url" :  u , "chk" : 0}
             
             self.t.insert_one(newsbody,bypass_document_validation = True)
-        except Exception as e:
-            self.te.insert_one({"url" : u,"posttime" : tday},bypass_document_validation = True)
-            print(e)
+        except Exception:
+            try:
+                self.te.insert_one({"url" : u,"posttime" : tday},bypass_document_validation = True)
+            except Exception:
+                
+                pass
+            
             pass
         #NoneType
     
