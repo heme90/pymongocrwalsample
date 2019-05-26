@@ -1,24 +1,34 @@
 # pymongocrwalsample
-crwaling  by bs4 store by pymongo, you need to open your mongod port by mongoshell to run it
-bs4와 selenium, 기타 파이썬의 라이브러리들을 다양하게 응용해본 모듈 모음입니다
-정적 웹, 동적 웹문서 수집 및 적재, 문서의 단어를 추출해 mr작업의 기반을 만들기(by cpcloser), 
-doc2vec을 사용한 단어간 유사도 추출, 동적 웹페이지의 문서를 통한 word-counting, selenium을 통해 iframe의 데이터에 접근하기
+	
+	crwaling  by bs4 store by pymongo, you need to open your mongod port by mongoshell to run it
+	
+	bs4와 selenium, 기타 파이썬의 라이브러리들을 다양하게 응용해본 모듈 모음입니다
+	
+	정적 웹,동적 웹문서 수집 및 적재
+	
+	문서의 단어를 추출해 mr작업의 기반을 만들기(by cpcloser) 
+	
+	doc2vec을 사용한 단어간 유사도 추출 
+	
+	동적 웹페이지의 문서를 통한 word-counting
+	
+	selenium을 통해 iframe의 데이터에 접근하기
 
 
 prepare:
--pip install bs4
--pip install requests
--pip install pymongo
--pip install lxml
--pip install selenium
--pip install gensim
+	
+	-pip install bs4
+	-pip install requests
+	-pip install pymongo
+	-pip install lxml
+	-pip install selenium
+	-pip install gensim
 
-gensim을 설치하기전 visual studio가 최신버전인지(c 컴파일러의 버전이 14++ 이상인지) 확인하십시오
-
-prepare:
--mongod command on shell to open your mongodb port
-mongo 서비스가 열려있어야 합니다, 커스텀 포트를 사용하기 위해선 mongod 커맨드를 사용하여야 합니다
-compath.bat은 mongod 서비스를 실행합니다 배치파일을 싱행하기전, 정확한 경로에 디렉토리와 로그 파일이 존재해야 합니다
+	gensim을 설치하기전 visual studio가 최신버전인지(c 컴파일러의 버전이 14++ 이상인지) 확인하십시오
+	
+	-mongod command on shell to open your mongodb port
+	mongo 서비스가 열려있어야 합니다, 커스텀 포트를 사용하기 위해선 mongod 커맨드를 사용하여야 합니다
+	compath.bat은 mongod 서비스를 실행합니다 배치파일을 싱행하기전, 정확한 경로에 디렉토리와 로그 파일이 존재해야 합니다
 
 -package crawler
 	
