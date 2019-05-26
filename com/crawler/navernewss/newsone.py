@@ -27,7 +27,7 @@ class cp_crwaler:
     te = con['news']['news_err']
     #db.news_main.ensureIndex({"url" : 1 } , {unique : true})
     t.create_index([("url",pymongo.ASCENDING)],unique=True)
-    #newspagelist = [itgi]  
+      
     te.create_index([("url",pymongo.ASCENDING)],unique=True)
     
     def formatdates(self,n):
@@ -106,8 +106,10 @@ class cp_crwaler:
         
         nd = 1
         date_list = self.formatdates(nd)
+        #병렬 스레드 처리할 풀 생성
         p = multiprocessing.Pool(8) 
         newspagelist = self.sectionss()
+        
         params = []
         for d in date_list:
             datess = self.newslistprev(d)
@@ -115,6 +117,7 @@ class cp_crwaler:
             for sec in newspagelist:
                 params.append((d,sec,datess,errs))
                         
+        #pool.map은 하나의 변수를 대입하므로 다변수를 파라미터로 받는 함수를 매핑할때는 튜플 형태를 사용합니다
         p.map(self.navercrawl,params)
     
     def mongoinsert(self,urls,tday):
@@ -127,6 +130,8 @@ class cp_crwaler:
             
     @asyncio.coroutine    
     async def mongoinasync(self,u,tday):
+        #비동기 함수에서는 코드의 실행에 순서가 없습니다, 페이지를 따오기 전에 파싱을 시작하면 nullpointer 익셉션이 발생하기 때문에
+        #페이지 요청을 받아오는 코드의 콜백을 기다려야 합니다
         newsdata = await asyncio.get_event_loop().run_in_executor(None, bs4.BeautifulSoup,requests.get(u).text,"lxml")
         
         #news number --> 시퀀스로 대체
@@ -149,6 +154,7 @@ class cp_crwaler:
             self.t.insert_one(newsbody,bypass_document_validation = True)
         except Exception:
             try:
+                #이후에 다시 일어날 익셉션을 방지하기 위해 err 컬렉션을 새로 만듭니다
                 self.te.insert_one({"url" : u,"posttime" : tday},bypass_document_validation = True)
             except Exception:
                 
@@ -157,6 +163,7 @@ class cp_crwaler:
             pass
         #NoneType
     
+    #사전에 입력되어있는 뉴스들을 조회하여 중복을 제거하기 위한 밑준비를 하는 함수입니다
     def newslistprev(self,d):
         
         dl = self.t.find({"posttime" : d },{"url" : 1})
@@ -164,6 +171,7 @@ class cp_crwaler:
         for i in dl:
             datess.append(i["url"])
         return datess
+    #이전에 익셉션이 일어나 입력되지 않은 url들을 조회하여 사전에 제거합니다
     def newserrprev(self,d):
         
         dl = self.te.find({"posttime" : d },{"url" : 1})
@@ -190,6 +198,7 @@ class cp_crwaler:
     
         temp = "";
         addr = s + "&date=" + d
+        #마지막 페이지를 찾는 반복문
         for p in range(1, 100):
         
             addrs = addr + "&page=" + str(p)
@@ -213,7 +222,7 @@ class cp_crwaler:
         del urllist   
         
         urls = np.setdiff1d(np.setdiff1d(urlset, datess),ers)    
-        
+        # 사용이 끝난 변수들은 del 명령어를 통해 vm에서 지워줘야한다, 특히 리스트는 힙메모리를 많이 먹기 때문에 반드시 지운다
         del urlset
         del datess
         del ers    
